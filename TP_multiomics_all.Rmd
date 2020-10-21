@@ -34,7 +34,7 @@ De l'aide est disponible sur leur site (http://mixomics.org/).
 1. Chargez le package `mixOmics`
 ```{r}
 getwd()
-setwd('path_to_the_data_directory')
+#setwd('path_to_the_data_directory')
 require(mixOmics)
 ```
 
@@ -69,7 +69,7 @@ coef_var = function(vecteur) {
 
 # coef_var(protein[,140])
 
-liste_mirna = apply(mirna, 2, coef_var) ; typeof(liste_prot)
+liste_mirna = apply(mirna, 2, coef_var) ; typeof(liste_mirna)
 liste_mrna = apply(mrna, 2, coef_var)
 liste_prot = apply(protein, 2, coef_var)
 ```
@@ -86,19 +86,43 @@ hist(liste_prot) # Les coeffcients de variation qui ont une valeur entre 0 et 50
 **Question 2:** La distribution des coefficients de variation est-elle similaire dans les 3 blocs ?
 Si oui, quel type de donnée possède le plus de variabilité ?
 ```{r}
-# La distrubution  des coefficients de variation ne semble pas similaire entre les trois blocs.
+# La distrubution  des coefficients de variation ne sont pas similaire entre les trois blocs.
+# Cependant elle semble identique entre les blocs mirna et mrna.
 
-var(liste_mirna)
-var(liste_mrna)
-var(liste_prot)
+var(liste_mirna) # 0.005311241
+var(liste_mrna) # 0.005311241
+var(liste_prot) # 1070.215
 ```
 
 
 5. Pour chacun des blocs, filtrez les données les plus variantes : $|c_{v}| \geq 0.15$
+```{r}
+liste_mirna_filtre = which(liste_mirna >= 0.15) ; typeof(liste_mirna_filtre)
+liste_mrna_filtre = which(liste_mrna >= 0.15)
+liste_prot_filtre = which(liste_prot >= 0.15)
+```
+
 
 **Question 3:**: Combien reste-il de gènes ? de protéines ? de miRNA ?
+```{r}
+length(liste_mirna_filtre) # 82
+length(liste_mrna_filtre) # 82
+length(liste_prot_filtre) # 90
+```
+
 
 **Question 4:** Quel est le gène le plus variant ? La protéine associé à ce gène est-elle présente dans le jeu de donnée.
+```{r}
+max(liste_mirna_filtre)
+max_liste_mirna = liste_mirna[181] ; max_liste_mirna # hsa.mir.96 max val = 0.2414325
+
+max(liste_mrna_filtre)
+max_liste_mrna = liste_mrna[181] ; max_liste_mrna # hsa.mir.96 max val = 0.2414325
+
+max(liste_prot_filtre)
+max_liste_prot = liste_prot[181] ; max_liste_prot # hsa.mir.96 pas dans le jeu de donnee.
+```
+
 
 **Question 5:** A l'aide des bases de donnée de votre choix répondez aux questions suivantes:
 
