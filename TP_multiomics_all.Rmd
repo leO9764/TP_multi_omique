@@ -42,7 +42,7 @@ require(mixOmics)
 2. Téléchargez et importez les données (4 fichiers: `mirna.csv`, `mrna.csv`, `protein.csv`, `sample_group.csv`)
 ```{r}
 mirna = read.table('mirna.csv', sep = ',', header = T, row.names = 1) ; typeof(mirna)
-mrna = read.table('mirna.csv', sep = ',', header = T, row.names = 1)
+mrna = read.table('mrna.csv', sep = ',', header = T, row.names = 1)
 protein = read.table('protein.csv', sep = ',', header = T, row.names = 1)
 sample = read.table('sample_group.csv', sep = ',', header = T, row.names = 1)
 ```
@@ -67,11 +67,10 @@ coef_var = function(vecteur) {
    return(coeff)
 }
 
-# coef_var(protein[,140])
 
-liste_mirna = apply(mirna, 2, coef_var) ; typeof(liste_mirna)
-liste_mrna = apply(mrna, 2, coef_var)
-liste_prot = apply(protein, 2, coef_var)
+liste_mirna = as.matrix(apply(mirna, 2, coef_var)) ; typeof(liste_mirna)
+liste_mrna = as.matrix(apply(mrna, 2, coef_var))
+liste_prot = as.matrix(apply(protein, 2, coef_var))
 ```
 
 
@@ -97,9 +96,9 @@ var(liste_prot) # 1070.215
 
 5. Pour chacun des blocs, filtrez les données les plus variantes : $|c_{v}| \geq 0.15$
 ```{r}
-liste_mirna_filtre = which(liste_mirna >= 0.15) ; typeof(liste_mirna_filtre)
-liste_mrna_filtre = which(liste_mrna >= 0.15)
-liste_prot_filtre = which(liste_prot >= 0.15)
+liste_mirna_filtre = mirna[, names(which(abs(apply(mirna, 2, coef_var)) >= 0.15))] ; class(liste_mirna_filtre)
+liste_mrna_filtre = mrna[, names(which(abs(apply(mrna, 2, coef_var)) >= 0.15))]
+liste_prot_filtre = protein[, names(which(abs(apply(protein, 2, coef_var)) >= 0.15))]
 ```
 
 
@@ -114,13 +113,13 @@ length(liste_prot_filtre) # 90
 **Question 4:** Quel est le gène le plus variant ? La protéine associé à ce gène est-elle présente dans le jeu de donnée.
 ```{r}
 max(liste_mirna_filtre)
-max_liste_mirna = liste_mirna[181] ; max_liste_mirna # hsa.mir.96 max val = 0.2414325
+max_liste_mirna = which(liste_mirna_filtre[,1] == max(liste_mirna_filtre)) ; max_liste_mirna # hsa.mir.452 max val = 0.362615
 
 max(liste_mrna_filtre)
-max_liste_mrna = liste_mrna[181] ; max_liste_mrna # hsa.mir.96 max val = 0.2414325
+max_liste_mrna = which(liste_mrna[,1] == max(liste_mrna_filtre)) ; max_liste_mrna # PLCD4 max val = 0.4687827
 
 max(liste_prot_filtre)
-max_liste_prot = liste_prot[181] ; max_liste_prot # hsa.mir.96 pas dans le jeu de donnee.
+max_liste_prot = which(liste_prot[,1] == max(liste_prot_filtre)) ; max_liste_prot # RBM3 max val = 225.9916 , proteine bien dans jeu de donnéé
 ```
 
 
@@ -141,8 +140,26 @@ max_liste_prot = liste_prot[181] ; max_liste_prot # hsa.mir.96 pas dans le jeu d
 ## 1. Single-omic: l'ACP avec `mixOmics`
 
 **Question 6:** A quoi sert l'Analyse en Composante Principale ? Expliquez brievement sont fonctionnement ?
+##### Répondre plus tard
 
 1. Réaliser l'ACP sur les données mRNA.
+```{r}
+acp_mrna = pca(liste_mrna_filtre, ncomp = 10)
+
+plot(acp_mrna)
+
+eigen(acp_mrna$ncomp)
+
+plotIndiv(acp_mrna)
+plotVar(acp_mrna)
+biplot(acp_mrna)
+```
+```{r}
+acp_mrna2 = pca(liste_mrna_filtre, ncomp = 40)
+plot(acp_mrna2)
+
+```
+
 
 **Question 7:** Combien de composantes retenez-vous ? Justifiez / Illustrez
 
