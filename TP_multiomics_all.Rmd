@@ -146,24 +146,23 @@ max_liste_prot = which(liste_prot[,1] == max(liste_prot_filtre)) ; max_liste_pro
 ```{r}
 acp_mrna = pca(liste_mrna_filtre, ncomp = 10)
 
-plot(acp_mrna)
+dim(liste_mrna_filtre)
 
-eigen(acp_mrna$ncomp)
+plot(acp_mrna) # on choisit 2 composantes car c'est le coude au niveau du plot
 
 plotIndiv(acp_mrna)
 plotVar(acp_mrna)
 biplot(acp_mrna)
-```
-```{r}
-acp_mrna2 = pca(liste_mrna_filtre, ncomp = 40)
-plot(acp_mrna2)
-
 ```
 
 
 **Question 7:** Combien de composantes retenez-vous ? Justifiez / Illustrez
 
 2. Après avoir relancer l'ACP avec le bon nombre de composante, utiliser un graphique pour représenter les variables.
+```{r}
+acp_mrna2 = pca(liste_mrna_filtre, ncomp = 2) 
+plot(acp_mrna2)
+```
 
 **Question 8:** Quelles sont les variables qui contribuent le plus à l'axe 1 ?
 
