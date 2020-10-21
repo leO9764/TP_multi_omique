@@ -127,8 +127,11 @@ max_liste_prot = liste_prot[181] ; max_liste_prot # hsa.mir.96 pas dans le jeu d
 **Question 5:** A l'aide des bases de donnée de votre choix répondez aux questions suivantes:
 
  * Quel est le rôle de ce gène ? 
- * Sur quel chromosome est-il localisé ? 
+   Il diminue l'expression du récepteur hepatic SRB1, qui a pour rôle l'a prise'absorption de HDLC dans les cellules hépatiques
+ * Sur quel chromosome est-il localisé ?
+   Location: 7q32.2
  * Quelle est la longueur en nucléotide de sa séquence ?
+    78 bp    RNA     linear
  * Quelle est la longueur en acides aminés de la protéine associée (ou des isoformes) ?
 
 \newpage
