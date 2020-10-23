@@ -170,7 +170,8 @@ plot(acp_mrna2)
 3. Avec un graphique, représenter les échantillons dans l'espace formé par les composantes. 
 Les échantillons sont colorés en fonction du groupe. Affichez la légende et ajoutez un titre.
 ```{r}
-plot(acp_mrna2$X[,1:2],col = liste_mrna_filtre[,1],main="Echantillons formé par les composantes de l'acp" )
+plot(acp_mrna2$X,col = liste_mrna_filtre[,1],main="Echantillons formé par les composantes de l'acp" )
+selectVar(acp_mrna2)
 legend(-3, 3, legend=c("Point 1", "Point 2","Point 3","Point 4","Point 5"),
        col=c("red", "blue","black","green","aquamarine"), pch =1, cex=0.8)
 ```
@@ -204,12 +205,18 @@ print(pls_mRNA_prot)
 2. Affichez un *scatter plot* des échantillons en affichant uniquement les composantes 2 et 3.
 Les échantillons doivent être coloriés par groupe. Ajoutez une légende et un titre.
 ```{r}
-plot(pls_mRNA_prot$X[,2:3],col = liste_mrna_filtre[,1])
+
+plot(pls_mRNA_prot$X[,2:3],col=liste_mrna_filtre[,1])
 
 ```
 
 3. Affichez un *arrow plot* en affichant uniquement les composantes 1 et 3.
 Les flèches doivent être coloriés par groupe. Ajoutez une légende et un titre.
+```{r}
+
+plotArrow(pls_mRNA_prot)
+
+```
 
 4. La *sparse PLS* `spls()` implémente une étape de *feature selection*. En utilisant la documentation de la fonction et/ou l'aide disponible en ligne,  utilisez la *sPLS* de manière a sélectionner (10 gènes, 9 protéines) sur la première composante, (5 gènes, 5 protéines) sur la seconde composante et (1 gène, 1 protéine) sur la troisième composante.
 
