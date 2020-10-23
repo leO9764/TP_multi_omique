@@ -190,6 +190,11 @@ selectVar(spca_mrna, comp = 2)$value
 ## 2. Projection on Latent Structures
 
 1. Réalisez une PLS `pls()` avec les données mRNA et protéines en incluant 3 composantes `(ncomp = 3)`.
+```{r}
+pls_mRNA_prot=pls(liste_mrna_filtre,liste_prot_filtre, ncomp=3)
+print(pls_mRNA_prot)
+plotIndiv(pls_mRNA_prot)
+```
 
 **Question 10:** A quoi sert la régression PLS pour l'intégration multi-omique?
 
