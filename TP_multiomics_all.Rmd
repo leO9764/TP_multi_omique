@@ -126,13 +126,13 @@ max_liste_prot = which(liste_prot[,1] == max(liste_prot_filtre)) ; max_liste_pro
 **Question 5:** A l'aide des bases de donnée de votre choix répondez aux questions suivantes:
 
  * Quel est le rôle de ce gène ? 
-   Il diminue l'expression du récepteur hepatic SRB1, qui a pour rôle l'a prise'absorption de HDLC dans les cellules hépatiques
+   Ce gène code pour un membre de la classe delta des enzymes phospholipases C. Les enzymes phospholipase C jouent un rôle critique dans de nombreux processus cellulaires en hydrolysant le phosphatidylinositol 4,5-bisphosphate en deux messagers secondaires intracellulaires, l'inositol 1,4,5-trisphosphate et le diacylglycérol. L'expression de ce gène peut être un marqueur du cancer.
  * Sur quel chromosome est-il localisé ?
-   Location: 7q32.2
+   Location: Chromosome 2
  * Quelle est la longueur en nucléotide de sa séquence ?
-    78 bp    RNA     linear
+   30 316 nucleotides   
  * Quelle est la longueur en acides aminés de la protéine associée (ou des isoformes) ?
-
+   762 acides aminés
 \newpage
 
 # Partie II
