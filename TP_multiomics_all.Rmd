@@ -169,10 +169,15 @@ plot(acp_mrna2)
 3. Avec un graphique, représenter les échantillons dans l'espace formé par les composantes. 
 Les échantillons sont colorés en fonction du groupe. Affichez la légende et ajoutez un titre.
 ```{r}
-plot(acp_mrna2$X[,1:2])
+plot(acp_mrna2$X[,1:2],col = liste_mrna_filtre[,1] )
 ```
 
 4. La *sparse ACP* `spca()` implémente une étape de *feature selection*. En utilisant la documentation de la fonction et/ou l'aide disponible en ligne,  utilisez la `spca()` de manière a sélectionner 10 gènes sur la première composante et 5 gènes sur la seconde composante.
+
+```{r}
+spca_mrna=spca(liste_mrna_filtre,ncomp=2,keepX=c( 10,5))
+print(spca_mrna)
+```
 
 **Question 9:** Quelles sont les gènes que vous avez sélectionnés? *(une fonction est disponible)*
 
