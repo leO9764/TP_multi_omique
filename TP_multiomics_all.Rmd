@@ -177,9 +177,15 @@ plot(acp_mrna2$X[,1:2],col = liste_mrna_filtre[,1] )
 ```{r}
 spca_mrna=spca(liste_mrna_filtre,ncomp=2,keepX=c( 10,5))
 print(spca_mrna)
+plotVar(spca_mrna,cex=0.5)
+selectVar(spca.result, comp = 1)$value
 ```
 
 **Question 9:** Quelles sont les gènes que vous avez sélectionnés? *(une fonction est disponible)*
+```{r}
+selectVar(spca_mrna, comp = 1)$value
+selectVar(spca_mrna, comp = 2)$value
+```
 
 
 ## 2. Projection on Latent Structures
