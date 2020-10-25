@@ -166,10 +166,12 @@ plot(acp_mrna2)
 ```
 
 **Question 8:** Quelles sont les variables qui contribuent le plus à l'axe 1 ?
+Avec le plotloadings de mixomics, on peut observer l'importance des variables de chaque composantes (taille des barres), Ordonnées par ordre d’importance. Avec ndisplay on sélectionne les 20 variables les plus importantes.
 
 3. Avec un graphique, représenter les échantillons dans l'espace formé par les composantes. 
 Les échantillons sont colorés en fonction du groupe. Affichez la légende et ajoutez un titre.
 ```{r}
+plotLoadings(acp_mrna2, ndisplay =20)
 plot(acp_mrna2$X,col = liste_mrna_filtre[,1],main="Echantillons formé par les composantes de l'acp" )
 selectVar(acp_mrna2)
 legend(-3, 3, legend=c("Point 1", "Point 2","Point 3","Point 4","Point 5"),
@@ -195,8 +197,13 @@ selectVar(spca_mrna, comp = 2)$value
 
 1. Réalisez une PLS `pls()` avec les données mRNA et protéines en incluant 3 composantes `(ncomp = 3)`.
 ```{r}
-pls_mRNA_prot=pls(liste_mrna_filtre,liste_prot_filtre, ncomp=3)
-print(pls_mRNA_prot)
+pls_mRNA_prot=pls(liste_mrna_filtre,liste_prot_filtre, ncomp=4)
+set.seed(30) # for reproducbility in this vignette, otherwise increase nrepeat
+perf.pls <- perf(pls_mRNA_prot, validation = "Mfold", folds = 5,
+                  progressBar = FALSE, nrepeat = 10)
+plot(perf.pls$Q2.total)
+abline(h = 0.0975)#he rule of thumbs is that a PLS component should be included in the model if its value is ≤0.0975
+ 
 
 ```
 
