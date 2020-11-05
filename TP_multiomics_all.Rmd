@@ -50,10 +50,10 @@ sample = read.table('sample_group.csv', sep = ',', header = T, row.names = 1)
 
 **Question 1:** Combien avez-vous d'échantillons ? de variables (mRNA, protéines, miRNA) ?
 ```{r}
-dim(mirna) # 150 observations pour 185 variables
-dim(mrna) # 150 observations pour 185 variables
-dim(protein) # 150 observations pour 143 variables
-dim(sample) # 150 observations pour 2 variables
+dim(mirna) # 150 observations pour 184 variables
+dim(mrna) # 150 observations pour 200 variables
+dim(protein) # 150 observations pour 142 variables
+dim(sample) # 150 observations pour 1 variable
 ```
 
 
@@ -89,7 +89,7 @@ Si oui, quel type de donnée possède le plus de variabilité ?
 # Cependant elle semble identique entre les blocs mirna et mrna.
 
 var(liste_mirna) # 0.005311241
-var(liste_mrna) # 0.005311241
+var(liste_mrna) # 0.003948499
 var(liste_prot) # 1070.215
 ```
 
