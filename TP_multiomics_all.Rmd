@@ -113,7 +113,7 @@ length(liste_prot_filtre) # 142
 **Question 4:** Quel est le gène le plus variant ? La protéine associé à ce gène est-elle présente dans le jeu de donnée.
 ```{r}
 max(liste_mirna_filtre)
-max_liste_mirna = which(colnames(liste_mirna_filtre == max(liste_mirna_filtre))) ; max_liste_mirna # hsa.mir.452 max val = 0.362615
+max_liste_mirna = which(colnames(liste_mirna_filtre) == max(liste_mirna_filtre)) ; max_liste_mirna # hsa.mir.452 max val = 0.362615
 
 max(liste_mrna_filtre)
 max_liste_mrna = which(liste_mrna[,1] == max(liste_mrna_filtre)) ; max_liste_mrna # PLCD4 max val = 0.4687827
