@@ -303,14 +303,14 @@ Le fichier `sample_groupe.csv` associe un groupe à chaque échantillon.
 **Question 15:** Donnez la répartition des groupes.
 
 ```{r}
-sampl_group$Y
+sample$Y
 ```
 
 1. Utilisez la `pls.da()` en utilisant les gènes (`X`) et le groupe (`Y`) avec 2 composantes.
 
 ```{r}
 
-plsda_gene = plsda(X =liste_mrna_filtre , Y = sampl_group$Y,ncomp = 2)
+plsda_gene = plsda(X =liste_mrna_filtre , Y = sample$Y,ncomp = 2)
 plsda_gene
 
 ```
