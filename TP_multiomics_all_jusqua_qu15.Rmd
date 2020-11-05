@@ -1,0 +1,387 @@
+libray---
+title: "TP \"Multi-omics\""
+date: "20 - 21 octobre 2020"
+output: pdf_document
+---
+
+## Consignes
+
+Vous avez jusqu'au 30 Octobre 2020 pour rendre le devoir. Vous devez nous
+remettre un fichier Rmd qui contient les réponses à toutes les questions.
+Vous inclurez également **toutes les commandes** qui vous ont permises de répondre
+aux questions.
+
+N'oubliez pas d'inclure le nom et le prénom de tous les membres de l'équipe.
+
+Vous pouvez nous joindre aux adresses suivantes:
+
+* Arnaud Droit: Arnaud.Droit@crchudequebec.ulaval.ca
+* Antoine Bodein: Antoine.Bodein@crchudequebec.ulaval.ca
+* Charles Joly Beauparlant: Charles.Joly-Beauparlant@crchudequebec.ulaval.ca
+
+## Objectifs
+
+Utiliser les méthodes vu en cours pour intégrer des données multi-omiques.
+Une grande partie du TP est réalisé grâce à la suite d'outils `mixOmics`.
+De l'aide est disponible sur leur site (http://mixomics.org/).
+
+---
+
+# Partie I
+
+## 0. Préparation
+
+1. Chargez le package `mixOmics`
+```{r}
+getwd()
+#setwd('path_to_the_data_directory')
+library("mixOmics")
+```
+
+
+2. Téléchargez et importez les données (4 fichiers: `mirna.csv`, `mrna.csv`, `protein.csv`, `sample_group.csv`)
+```{r}
+mirna = read.table('mirna.csv', sep = ',', header = T, row.names = 1) ; typeof(mirna)
+mrna = read.table('mrna.csv', sep = ',', header = T, row.names = 1)
+protein = read.table('protein.csv', sep = ',', header = T, row.names = 1)
+sample = read.table('sample_group.csv', sep = ',', header = T, row.names = 1)
+```
+
+
+**Question 1:** Combien avez-vous d'échantillons ? de variables (mRNA, protéines, miRNA) ?
+```{r}
+dim(mirna) # 150 observations pour 185 variables
+dim(mrna) # 150 observations pour 185 variables
+dim(protein) # 150 observations pour 143 variables
+dim(sample) # 150 observations pour 2 variables
+```
+
+
+3. Le coefficient de variation est défini comme le rapport entre l'écart-type $\sigma$ et la moyenne $\mu$ : $c_v = \frac{\sigma}{\mu}$
+Construisez une fonction qui calcule le coefficient de variation à partir d'un vecteur.
+```{r}
+coef_var = function(vecteur) {
+  ecart = sd(vecteur)
+   moy = mean(vecteur)
+   coeff = ecart/moy
+   return(coeff)
+}
+
+
+liste_mirna = as.matrix(apply(mirna, 2, coef_var)) ; typeof(liste_mirna)
+liste_mrna = as.matrix(apply(mrna, 2, coef_var))
+liste_prot = as.matrix(apply(protein, 2, coef_var))
+```
+
+
+4. A l'aide d'un histogramme `hist()` affichez la distribution de chacun des blocs.
+```{r}
+hist(liste_mirna) # Les coeffcients de variation qui ont une valeur entre 0.05 et 0.1 sont les plus representes
+hist(liste_mrna) # Les coeffcients de variation qui ont une valeur entre 0.05 et 0.1 sont les plus representes
+hist(liste_prot) # Les coeffcients de variation qui ont une valeur entre 0 et 50 sont les plus representes
+```
+
+
+**Question 2:** La distribution des coefficients de variation est-elle similaire dans les 3 blocs ?
+Si oui, quel type de donnée possède le plus de variabilité ?
+```{r}
+# La distrubution  des coefficients de variation ne sont pas similaire entre les trois blocs.
+# Cependant elle semble identique entre les blocs mirna et mrna.
+
+var(liste_mirna) # 0.005311241
+var(liste_mrna) # 0.005311241
+var(liste_prot) # 1070.215
+```
+
+
+5. Pour chacun des blocs, filtrez les données les plus variantes : $|c_{v}| \geq 0.15$
+```{r}
+liste_mirna_filtre = mirna[, names(which(abs(apply(mirna, 2, coef_var)) >= 0.15))] ; class(liste_mirna_filtre)
+liste_mrna_filtre = mrna[, names(which(abs(apply(mrna, 2, coef_var)) >= 0.15))]
+liste_prot_filtre = protein[, names(which(abs(apply(protein, 2, coef_var)) >= 0.15))]
+```
+
+
+**Question 3:**: Combien reste-il de gènes ? de protéines ? de miRNA ?
+```{r}
+length(liste_mirna_filtre) # 82
+length(liste_mrna_filtre) # 82
+length(liste_prot_filtre) # 90
+```
+
+
+**Question 4:** Quel est le gène le plus variant ? La protéine associé à ce gène est-elle présente dans le jeu de donnée.
+```{r}
+max(liste_mirna_filtre)
+max_liste_mirna = which(liste_mirna_filtre[,1] == max(liste_mirna_filtre)) ; max_liste_mirna # hsa.mir.452 max val = 0.362615
+
+max(liste_mrna_filtre)
+max_liste_mrna = which(liste_mrna[,1] == max(liste_mrna_filtre)) ; max_liste_mrna # PLCD4 max val = 0.4687827
+
+max(liste_prot_filtre)
+max_liste_prot = which(liste_prot[,1] == max(liste_prot_filtre)) ; max_liste_prot # RBM3 max val = 225.9916 , proteine bien dans jeu de donnéé
+```
+
+
+**Question 5:** A l'aide des bases de donnée de votre choix répondez aux questions suivantes:
+
+ * Quel est le rôle de ce gène ? 
+   Ce gène code pour un membre de la classe delta des enzymes phospholipases C. Les enzymes phospholipase C jouent un rôle critique dans de nombreux processus cellulaires en hydrolysant le phosphatidylinositol 4,5-bisphosphate en deux messagers secondaires intracellulaires, l'inositol 1,4,5-trisphosphate et le diacylglycérol. L'expression de ce gène peut être un marqueur du cancer.
+ * Sur quel chromosome est-il localisé ?
+   Location: Chromosome 2
+ * Quelle est la longueur en nucléotide de sa séquence ?
+   30 316 nucleotides   
+ * Quelle est la longueur en acides aminés de la protéine associée (ou des isoformes) ?
+   762 acides aminés
+\newpage
+
+# Partie II
+
+## 1. Single-omic: l'ACP avec `mixOmics`
+
+**Question 6:** A quoi sert l'Analyse en Composante Principale ? Expliquez brievement sont fonctionnement ?
+##### Répondre plus tard
+
+1. Réaliser l'ACP sur les données mRNA.
+```{r}
+acp_mrna = pca(liste_mrna_filtre, ncomp = 10)
+
+dim(liste_mrna_filtre)
+
+plot(acp_mrna) # on choisit 2 composantes car c'est le coude au niveau du plot
+
+plotIndiv(acp_mrna)
+plotVar(acp_mrna)
+biplot(acp_mrna)
+```
+
+
+**Question 7:** Combien de composantes retenez-vous ? Justifiez / Illustrez
+Nous retenons 2 composants, car ils représentent environs 35% de la variance
+
+2. Après avoir relancer l'ACP avec le bon nombre de composante, utiliser un graphique pour représenter les variables.
+```{r}
+acp_mrna2 = pca(liste_mrna_filtre, ncomp = 2) 
+plot(acp_mrna2)
+```
+
+**Question 8:** Quelles sont les variables qui contribuent le plus à l'axe 1 ?
+Avec le plotloadings de mixomics, on peut observer l'importance des variables de chaque composantes (taille des barres), Ordonnées par ordre d’importance. Avec ndisplay on sélectionne les 20 variables les plus importantes.
+
+3. Avec un graphique, représenter les échantillons dans l'espace formé par les composantes. 
+Les échantillons sont colorés en fonction du groupe. Affichez la légende et ajoutez un titre.
+```{r}
+plotLoadings(acp_mrna2, ndisplay =20)
+plot(acp_mrna2$X,col = liste_mrna_filtre[,1],main="Echantillons formé par les composantes de l'acp" )
+selectVar(acp_mrna2)
+legend(-3, 3, legend=c("Point 1", "Point 2","Point 3","Point 4","Point 5"),
+       col=c("red", "blue","black","green","aquamarine"), pch =1, cex=0.8)
+```
+
+4. La *sparse ACP* `spca()` implémente une étape de *feature selection*. En utilisant la documentation de la fonction et/ou l'aide disponible en ligne,  utilisez la `spca()` de manière a sélectionner 10 gènes sur la première composante et 5 gènes sur la seconde composante.
+
+```{r}
+spca_mrna=spca(liste_mrna_filtre,ncomp=2,keepX=c( 10,5))
+print(spca_mrna)
+plotVar(spca_mrna,cex=0.5)
+```
+
+**Question 9:** Quelles sont les gènes que vous avez sélectionnés? *(une fonction est disponible)*
+```{r}
+selectVar(spca_mrna, comp = 1)$value
+selectVar(spca_mrna, comp = 2)$value
+```
+
+
+## 2. Projection on Latent Structures
+
+1. Réalisez une PLS `pls()` avec les données mRNA et protéines en incluant 3 composantes `(ncomp = 3)`.
+```{r}
+pls_mRNA_prot=pls(liste_mrna_filtre,liste_prot_filtre, ncomp=4)
+set.seed(30) # for reproducbility in this vignette, otherwise increase nrepeat
+perf.pls <- perf(pls_mRNA_prot, validation = "Mfold", folds = 5,
+                  progressBar = FALSE, nrepeat = 10)
+plot(perf.pls$Q2.total)
+abline(h = 0.0975)#he rule of thumbs is that a PLS component should be included in the model if its value is ≤0.0975
+ 
+
+```
+
+**Question 10:** A quoi sert la régression PLS pour l'intégration multi-omique?
+
+2. Affichez un *scatter plot* des échantillons en affichant uniquement les composantes 2 et 3.
+Les échantillons doivent être coloriés par groupe. Ajoutez une légende et un titre.
+```{r}
+
+plot(pls_mRNA_prot$X[,2:3],col=liste_mrna_filtre[,1])
+
+```
+
+3. Affichez un *arrow plot* en affichant uniquement les composantes 1 et 3.
+Les flèches doivent être coloriés par groupe. Ajoutez une légende et un titre.
+```{r}
+
+plotArrow(pls_mRNA_prot, comp = c(1,3),
+          group = sampl_group$Y,
+          legend = TRUE,
+          X.label = "PLS comp1",
+          Y.label = "PLS comp3",
+          title = "Arrow plot of mRNA and protein PLS (comp1, comp3)"
+          )
+```
+
+4. La *sparse PLS* `spls()` implémente une étape de *feature selection*. En utilisant la documentation de la fonction et/ou l'aide disponible en ligne,  utilisez la *sPLS* de manière a sélectionner (10 gènes, 9 protéines) sur la première composante, (5 gènes, 5 protéines) sur la seconde composante et (1 gène, 1 protéine) sur la troisième composante.
+
+```{r}
+RNA_prot.spls =spls(X= liste_mrna_filtre, Y = liste_prot_filtre, ncomp = 3, 
+                    mode = "regression", scale = TRUE, keepX = c(10,5,1),keepY = c(9,5,1))
+RNA_prot.spls
+
+
+```
+
+**Question 11:** Quels sont les variables sélectionnées sur la troisième composante.
+
+```{r}
+
+#(1 gène, 1 protéine) sur la troisième composante.
+plotLoadings(RNA_prot.spls, comp = 3, title = "spls, comp3", size.name = 0.8)
+
+```
+
+
+5. Affichez un *CIM plot* à partir du modèle *sPLS*.
+
+```{r}
+
+cim(RNA_prot.spls, title = "CIM Plot of spls (mRNA and proteine)" ,save = 'jpeg', name.save = 'sPLScim')
+```
+
+**Question 12:** Quels sont les gènes et les protéines les plus corrélés? Justifiez à partir de la matrice de corrélation calculée par `cim()`.
+
+```{r}
+
+correlation = cim(RNA_prot.spls, title = "CIM Plot of spls")$mat.co
+```
+
+6. Toujours à partir du même modèle *sPLS*, affichez un *network plot* en affichant uniquement les les corrélations les plus forte $(\rho \pm 0.65)$.
+
+```{r}
+
+network(RNA_prot.spls,  cutoff =0.65, save = 'jpeg', name.save = 'sPLSnetwork')
+
+```
+
+**Question 13:** Combien de clusters / sous-graphes observés vous ?
+
+## 2. *multiblock* Projection on Latent Structures
+
+1. Réalisez une multiblock PLS `pls()` avec les données mRNA, protéines et miRNA `(X = list(mrna, prot), Y = mirna)` en incluant 2 composantes `(ncomp = 2)`.
+
+```{r}
+
+pls_rna_prot_mirna =block.pls(X =list(mRNA,  liste_prot_filtre) ,Y =liste_mirna_filtre ,ncomp = 2)
+pls_rna_prot_mirna
+
+```
+
+2. Comme la `spls()`, la `block.spls()` implémente une étape de *feature selection*. En utilisant la documentation de la fonction et/ou l'aide disponible en ligne,  utilisez la fonction de manière a sélectionner (10 gènes, 9 protéines, 7 miRNA) sur la première composante et (5 gènes, 4 protéines, 3 miRNA) sur la seconde composante.
+
+```{r}
+RNA_prot_miRNA.spls =block.spls(X= list(liste_mrna_filtre, liste_prot_filtre), Y = miRNA, ncomp = 1, 
+                    mode = "regression", scale = TRUE, keepX = c(10,9),keepY = c(7))
+RNA_prot_miRNA.spls
+
+```
+
+**Question 14:** Quels sont les variables sélectionnées sur la première composante.
+
+## 3. Analyse supervisée : (s)PLS-DA
+
+Le fichier `sample_groupe.csv` associe un groupe à chaque échantillon.
+
+**Question 15:** Donnez la répartition des groupes.
+
+```{r}
+sampl_group$Y
+```
+
+1. Utilisez la `pls.da()` en utilisant les gènes (`X`) et le groupe (`Y`) avec 2 composantes.
+
+```{r}
+
+plsda_gene = plsda(X =liste_mrna_filtre , Y = sampl_group$Y,ncomp = 2)
+plsda_gene
+
+```
+
+2. Affichez le graphe des échantillons.
+
+```{r}
+
+plotIndiv(plsda_gene, col = c("red","blue", "darkgreen"), legend = T, ellipse = T ,ind.names= F)
+
+```
+
+**Question 16:** Comparez ce graphe avec le graphe des échantillons obtenu avec l'ACP (1.3). Quel méthode permet d'obtenir de meilleurs clusters?
+
+## 4. Analyse supervisée : block-(s)PLS-DA
+
+1. Réalisez une multiblock sPLS-DA `block.splsda()` avec les données mRNA, protéines, miRNA `(X = list(mrna, prot, mirna))` et le groupe en incluant 5 composantes `(ncomp = 5)`.
+
+```{r}
+
+
+
+```
+
+2. Utiliser la fonction `perf()` sur le modèle obtenu. 
+
+```{r}
+
+
+
+```
+
+**Question 17:** Quelle serait le nombre de composante minimal à inclure ?
+
+3. Relancez le modèle avec 2 composantes et utilisez l'option `keepX` pour sélectionner 15 gènes, protéines et miRNA sur la première compoante et 10 gènes, protéines et miRNA sur la seconde composante.
+
+```{r}
+
+
+
+```
+
+4. Réalisez un *circos plot* avec le modèle obtenu en affichant les corrélations fortes $|\rho| > 0.5$. Ajoutez un titre.
+
+```{r}
+
+
+
+```
+
+---
+
+# Partie III
+
+## 5. Mises en situation
+
+Dans cette section, nous allons vous présenter deux designs expérimentaux et il
+vous faudra déterminer quelle est l'approche analytique à privilégier pour
+répondre aux questions demandées. Il s'agit d'intégrer à la fois l'informations
+sur l'analyse bioinformatique en partant des données brutes mais également de
+cibler les bonnes approches multiomiques.
+
+1. Un de vos collègue s'intéresse aux effets de l'exposition à des polluants
+   sur la santé des ours polaires. Pour ce faire, il a accès à des données
+   transcriptomiques provenant d'une vingtaine de trios (un mère et sa portée
+   de deux enfants) ainsi qu'à diverses mesures cliniques numériques pour tous
+   les échantillons.
+
+2. Vous travaillez sur un modèle murin et vous souhaitez comprendre les impacts
+   d'un traitement sur le microbiote. Vous avez accès à des données de
+   séquençage de type 16S ainsi qu'à des données de métabolomiques pour des
+   souris traitées et pour des souris non-traitées. Vous pouvez prendre pour
+   acquis que l'analyse primaire des données de métabolomiques a déjà été
+   complétées et que vous avez déjà accès aux décomptes pour chaque molécules.
