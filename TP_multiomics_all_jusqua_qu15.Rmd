@@ -333,18 +333,18 @@ plotIndiv(plsda_gene, col = c("red","blue", "darkgreen"), legend = T, ellipse = 
 1. Réalisez une multiblock sPLS-DA `block.splsda()` avec les données mRNA, protéines, miRNA `(X = list(mrna, prot, mirna))` et le groupe en incluant 5 composantes `(ncomp = 5)`.
 
 ```{r}
+
 data2 = list(mrna = liste_mrna_filtre, mirna = liste_mirna_filtre, proteine = liste_prot_filtre)
 RNA_prot_miRNA.splsda = block.splsda(X = data2, Y = sample$Y, ncomp = 5)
 RNA_prot_miRNA.splsda
-
 
 ```
 
 2. Utiliser la fonction `perf()` sur le modèle obtenu. 
 
 ```{r}
-plot(perf(RNA_prot_miRNA.splsda))
 
+plot(perf(RNA_prot_miRNA.splsda))
 
 ```
 
