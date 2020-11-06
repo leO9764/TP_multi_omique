@@ -3,6 +3,12 @@ title: "TP \"Multi-omics\""
 date: "20 - 21 octobre 2020"
 output: pdf_document
 ---
+Maury Léo
+
+Bodin Raphaël 
+
+Rambaud opale 
+
 
 ## Consignes
 
@@ -62,6 +68,11 @@ dim(sample) # 150 observations pour 2 variables
 
 ```
 
+Pour mirna il y a 150 ech pour 185 variables 
+
+Pour mrna il y a 150 ech pour 185 variables
+
+Pour protein il y a 150 ech pour 143 variables
 
 3. Le coefficient de variation est défini comme le rapport entre l'écart-type $\sigma$ et la moyenne $\mu$ : $c_v = \frac{\sigma}{\mu}$
 Construisez une fonction qui calcule le coefficient de variation à partir d'un vecteur.
@@ -91,6 +102,12 @@ hist(liste_prot) # Les coeffcients de variation qui ont une valeur entre 0 et 50
 
 ```
 
+Pour mirna les coeffcients de variation qui ont une valeur entre 0.05 et 0.1 sont les plus representes.
+ 
+Pour mrna les coeffcients de variation qui ont une valeur entre 0.05 et 0.1 sont les plus representes.
+ 
+Pour prot les coeffcients de variation qui ont une valeur entre 0 et 50 sont les plus representes.
+ 
 
 **Question 2:** La distribution des coefficients de variation est-elle similaire dans les 3 blocs ?
 Si oui, quel type de donnée possède le plus de variabilité ?
@@ -104,6 +121,10 @@ var(liste_mrna) # 0.005311241
 var(liste_prot) # 1070.215
 
 ```
+
+
+La distrubution  des coefficients de variation ne sont pas similaire entre les trois blocs.
+Cependant elle semble identique entre les blocs mirna et mrna.
 
 
 5. Pour chacun des blocs, filtrez les données les plus variantes : $|c_{v}| \geq 0.15$
@@ -125,6 +146,12 @@ length(liste_prot_filtre) # 90
 
 ```
 
+Pour mirna il reste 82 gènes.
+
+Pour mrna il reste 82 gènes.
+
+Pour prot il reste 90 gènes.
+
 
 **Question 4:** Quel est le gène le plus variant ? La protéine associé à ce gène est-elle présente dans le jeu de donnée.
 ```{r}
@@ -139,6 +166,12 @@ max(liste_prot_filtre)
 max_liste_prot = which(liste_prot[,1] == max(liste_prot_filtre)) ; max_liste_prot # RBM3 max val = 225.9916 , proteine bien dans jeu de donnéé
 
 ```
+
+Pour mirna le gène le plus variant est :  hsa.mir.452.
+
+Pour mrna le gène le plus variant est : PLCD4..
+
+La protéine associée à ce gène est RBM3, elle est bien présente dans le jeu de données.
 
 
 **Question 5:** A l'aide des bases de donnée de votre choix répondez aux questions suivantes:
@@ -158,7 +191,10 @@ max_liste_prot = which(liste_prot[,1] == max(liste_prot_filtre)) ; max_liste_pro
 ## 1. Single-omic: l'ACP avec `mixOmics`
 
 **Question 6:** A quoi sert l'Analyse en Composante Principale ? Expliquez brievement sont fonctionnement ?
-##### Répondre plus tard
+
+La PCA permet d'extraire l'information pertinente et la synthétise sous forme de composantes principales, cela permet donc de décrire le jeu de données en fonction des observations ayant le plus de poids.
+Elle se base sur les variances et les valeurs propres du jeu de données.
+
 
 1. Réaliser l'ACP sur les données mRNA.
 ```{r}
@@ -177,7 +213,9 @@ biplot(acp_mrna)
 
 
 **Question 7:** Combien de composantes retenez-vous ? Justifiez / Illustrez
-Nous retenons 2 composants, car ils représentent environs 35% de la variance
+
+Nous retenons 2 composants, car ils représentent environs 35% de la variance. C'est le graphique précédent qui nous permet de déterminer cela avec l'apparition d'un coude. 
+
 
 2. Après avoir relancer l'ACP avec le bon nombre de composante, utiliser un graphique pour représenter les variables.
 ```{r}
@@ -188,6 +226,8 @@ plot(acp_mrna2)
 ```
 
 **Question 8:** Quelles sont les variables qui contribuent le plus à l'axe 1 ?
+
+
 Avec le plotloadings de mixomics, on peut observer l'importance des variables de chaque composantes (taille des barres), Ordonnées par ordre d’importance. Avec ndisplay on sélectionne les 20 variables les plus importantes.
 
 3. Avec un graphique, représenter les échantillons dans l'espace formé par les composantes. 
@@ -227,7 +267,7 @@ selectVar(spca_mrna, comp = 2)$value
 ```{r}
 
 pls_mRNA_prot = pls(liste_mrna_filtre,liste_prot_filtre, ncomp=4, scale = T, mode = "regression")
-set.seed(30) # for reproducbility in this vignette, otherwise increase nrepeat
+set.seed(30) 
 perf.pls <- perf(pls_mRNA_prot, validation = "Mfold", folds = 5,
                   progressBar = FALSE, nrepeat = 10)
 plot(perf.pls$Q2.total)
@@ -240,6 +280,10 @@ plotArrow(pls_mRNA_prot, group = sample$Y, legend = T, abline = T)
 ```
 
 **Question 10:** A quoi sert la régression PLS pour l'intégration multi-omique?
+
+
+La régression PLS permet d'observer la corrélation entre les gènes et les protéines. 
+
 
 2. Affichez un *scatter plot* des échantillons en affichant uniquement les composantes 2 et 3.
 Les échantillons doivent être coloriés par groupe. Ajoutez une légende et un titre.
@@ -285,6 +329,7 @@ plotLoadings(RNA_prot.spls, comp = 3, title = "spls, comp3", size.name = 0.8)
 
 ```
 
+1 gène et 1 protéine sont séléctionés.
 
 5. Affichez un *CIM plot* à partir du modèle *sPLS*.
 
@@ -434,7 +479,7 @@ cibler les bonnes approches multiomiques.
    de deux enfants) ainsi qu'à diverses mesures cliniques numériques pour tous
    les échantillons.
    
-
+Pour cette question les données semblent assez similaires à celles du reste du TP. On observe un seul type d'individus (ours polaires) représentés par des données transcriptomiques et cliniques. On applique donc un processus similaire en réalisant une séléction des gènes qui possèdent le plus grand coéficient de variation, puis une PCA. Cela permet de vérifier si un ou plusieurs polluants fait parti des composantes principales. Enfin on peut réaliser une PLS. 
 
 2. Vous travaillez sur un modèle murin et vous souhaitez comprendre les impacts
    d'un traitement sur le microbiote. Vous avez accès à des données de
@@ -442,3 +487,7 @@ cibler les bonnes approches multiomiques.
    souris traitées et pour des souris non-traitées. Vous pouvez prendre pour
    acquis que l'analyse primaire des données de métabolomiques a déjà été
    complétées et que vous avez déjà accès aux décomptes pour chaque molécules.
+
+
+Après avoir réalisé une PCA on observe l'apparition de cluster sur un plot pour vérifier si les deux populations de souoris se ditinguent bien.
+
