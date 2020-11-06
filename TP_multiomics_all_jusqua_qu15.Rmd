@@ -399,7 +399,11 @@ plot(perf(RNA_prot_miRNA.splsda))
 
 ```{r}
 
-RNA_prot_miRNA.splsda2 = block.splsda(X = data2, Y = sample$Y, ncomp = 2, keepX = list(1,2))
+keepX = list(mrna = c(15,10), prot = c(15,10), mirna = c(15,10))
+
+RNA_prot_miRNA.splsda2 = block.splsda(X = data2, Y = sample$Y, ncomp = 2, keepX, scale = T)
+
+#plotVar(RNA_prot_miRNA.splsda2, legend = T)
 
 ```
 
