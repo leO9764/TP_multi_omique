@@ -280,8 +280,8 @@ network(RNA_prot.spls,  cutoff = 0.65, save = 'jpeg', name.save = 'sPLSnetwork')
 
 ```{r}
 
-blocks = list(liste_mrna_filtre, liste_prot_filtre)
-pls_rna_prot_mirna = block.pls(X = blocks, Y = liste_mirna_filtre, ncomp = 2)
+blocks = list(t(liste_mrna_filtre), t(liste_prot_filtre))
+pls_rna_prot_mirna = block.pls(X = blocks, Y = t(liste_mirna_filtre), ncomp = 2)
 pls_rna_prot_mirna
 
 ```
@@ -311,7 +311,7 @@ sample$Y
 
 ```{r}
 
-plsda_gene = plsda(X = liste_mrna_filtre , Y = sample$Y,ncomp = 2)
+plsda_gene = plsda(X = liste_mrna_filtre , Y = sample$Y, ncomp = 2)
 plsda_gene
 
 ```
@@ -331,8 +331,8 @@ plotIndiv(plsda_gene, col = c("red","blue", "darkgreen"), legend = T, ellipse = 
 1. Réalisez une multiblock sPLS-DA `block.splsda()` avec les données mRNA, protéines, miRNA `(X = list(mrna, prot, mirna))` et le groupe en incluant 5 composantes `(ncomp = 5)`.
 
 ```{r}
-data2 = list(mrna = liste_mrna_filtre, mirna = liste_mirna_filtre, proteine =liste_prot_filtre)
-RNA_prot_miRNA.splsda =block.splsda(X= data2,Y=sample$Y, ncomp = 5)
+data2 = list(mrna = liste_mrna_filtre, mirna = liste_mirna_filtre, proteine = liste_prot_filtre)
+RNA_prot_miRNA.splsda = block.splsda(X = data2, Y = sample$Y, ncomp = 5)
 RNA_prot_miRNA.splsda
 
 
@@ -360,7 +360,7 @@ plot(perf(RNA_prot_miRNA.splsda))
 
 ```{r}
 
-
+circosPlot()
 
 ```
 
