@@ -292,7 +292,7 @@ pls_rna_prot_mirna
 ```{r}
 
 RNA_prot_miRNA.spls = block.spls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 1, 
-                    mode = "regression", scale = TRUE, keepX = list(10,9), keepY = c(7))
+                    mode = "regression", scale = TRUE, keepX = list(10,9), keepY = list(7))
 RNA_prot_miRNA.spls
 
 ```

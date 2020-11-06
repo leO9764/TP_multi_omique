@@ -241,6 +241,13 @@ plotArrow(pls_mRNA_prot)
 
 1. Réalisez une multiblock PLS `pls()` avec les données mRNA, protéines et miRNA `(X = list(mrna, prot), Y = mirna)` en incluant 2 composantes `(ncomp = 2)`.
 
+```{r}
+blocks = list(mrna = liste_mrna_filtre, prot = liste_prot_filtre)
+pls_rna_prot_mirna = block.pls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 2)
+pls_rna_prot_mirna
+```
+
+
 2. Comme la `spls()`, la `block.spls()` implémente une étape de *feature selection*. En utilisant la documentation de la fonction et/ou l'aide disponible en ligne,  utilisez la fonction de manière a sélectionner (10 gènes, 9 protéines, 7 miRNA) sur la première composante et (5 gènes, 4 protéines, 3 miRNA) sur la seconde composante.
 
 **Question 14:** Quels sont les variables sélectionnées sur la première composante.
