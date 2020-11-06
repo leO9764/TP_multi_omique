@@ -343,7 +343,9 @@ cim(RNA_prot.spls, title = "CIM Plot of spls (mRNA and proteine)" , save = 'jpeg
 
 ```{r}
 
-correlation = cim(RNA_prot.spls, title = "CIM Plot of spls",margins = c(2,2))$mat.cor
+pdf("cim.pdf")
+cim(RNA_prot.spls, title = "CIM Plot of spls", margins = c(2,2))$mat.cor
+dev.off()
 
 ```
 
@@ -351,11 +353,17 @@ correlation = cim(RNA_prot.spls, title = "CIM Plot of spls",margins = c(2,2))$ma
 
 ```{r}
 
-network(RNA_prot.spls,  cutoff = 0.65, save = 'jpeg', name.save = 'sPLSnetwork')
+pdf("network.pdf")
+network(RNA_prot.spls,  cutoff = 0.65)
+dev.off()
 
 ```
+Les gènes les plus corrélés semblent être les gènes KDM4B, ZNF552, PREX1, GATA3 et LRIG1.
+
 
 **Question 13:** Combien de clusters / sous-graphes observez vous ?
+Nous n'observons qu'un seul sous graphe, correspondant au groupe de gènes très corrélés.
+
 
 ## 2. *multiblock* Projection on Latent Structures
 
@@ -363,10 +371,12 @@ network(RNA_prot.spls,  cutoff = 0.65, save = 'jpeg', name.save = 'sPLSnetwork')
 
 ```{r}
 
-
 blocks = list(mrna = liste_mrna_filtre, prot = liste_prot_filtre)
+
 pls_rna_prot_mirna = block.pls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 2, scale = T)
 pls_rna_prot_mirna
+
+plotVar(pls_rna_prot_mirna, legend = T)
 
 ```
 
@@ -376,8 +386,8 @@ pls_rna_prot_mirna
 
 keepX = list(mrna = c(10,5), prot = c(9,4))
 
-RNA_prot_miRNA.spls = block.spls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 2,
-   mode = "regression", scale = T, keepX, keepY = list(7,3))
+RNA_prot_miRNA.spls =  block.spls(X = blocks, as.matrix(liste_mirna_filtre), ncomp = 2, scale = TRUE, Y =    as.matrix(liste_mirna_filtre), keepX, keepY = c(7,3))
+
 
 RNA_prot_miRNA.spls
 
@@ -385,7 +395,30 @@ plotVar(RNA_prot_miRNA.spls, legend = T)
 
 ```
 
+```{r}
+
+which(RNA_prot_miRNA.spls$loadings$mrna[,1] != 0)
+
+```
+
+```{r}
+
+which(RNA_prot_miRNA.spls$loadings$prot[,1] != 0)
+
+```
+
+```{r}
+
+which(RNA_prot_miRNA.spls$loadings$Y[,1] != 0)
+
+```
+
+
+
 **Question 14:** Quels sont les variables sélectionnées sur la première composante.
+Les gènes ASPM, KDM4B, ZNF552, FUT8, C4orf34, LRIG1, SLC43A3, TTC39A, CCNA2, PREX1.
+Les protéines AR, ASNS, CDK1, Chk2, Cyclin_B1, ER.alpha, GATA3, JNK2.
+Les mirna hsa.mir.106a, hsa.mir.130b, hsa.mir.17, hsa.mir.20a, hsa.mir.505, hsa.mir.590, hsa.mir.9.2.
 
 ## 3. Analyse supervisée : (s)PLS-DA
 
@@ -397,7 +430,13 @@ Le fichier `sample_groupe.csv` associe un groupe à chaque échantillon.
 
 sample$Y
 
+length(which(sample$Y == "Gr_1"))
+length(which(sample$Y == "Gr_2"))
+length(which(sample$Y == "Gr_3"))
+
+
 ```
+Il y a 45 échantillons dans le groupe 1, 30 dans le groupe 2 et 75 dans le 3e groupe.
 
 1. Utilisez la `pls.da()` en utilisant les gènes (`X`) et le groupe (`Y`) avec 2 composantes.
 
@@ -405,6 +444,8 @@ sample$Y
 
 plsda_gene = plsda(X = liste_mrna_filtre , Y = sample$Y, ncomp = 2)
 plsda_gene
+
+plotVar(plsda_gene, legend = T)
 
 ```
 
@@ -414,9 +455,12 @@ plsda_gene
 
 plotIndiv(plsda_gene, col = c("red","blue", "darkgreen"), legend = T, ellipse = T ,ind.names= F)
 
+plotIndiv(acp_mrna2, legend = T, ellipse = T, ind.names = F, group = sample$Y)
+
 ```
 
 **Question 16:** Comparez ce graphe avec le graphe des échantillons obtenu avec l'ACP (1.3). Quel méthode permet d'obtenir de meilleurs clusters?
+La méthode PLSDA semble permettre d'obtenir de meilleurs résultats.
 
 ## 4. Analyse supervisée : block-(s)PLS-DA
 
@@ -427,6 +471,8 @@ plotIndiv(plsda_gene, col = c("red","blue", "darkgreen"), legend = T, ellipse = 
 data2 = list(mrna = liste_mrna_filtre, mirna = liste_mirna_filtre, proteine = liste_prot_filtre)
 RNA_prot_miRNA.splsda = block.splsda(X = data2, Y = sample$Y, ncomp = 5)
 RNA_prot_miRNA.splsda
+
+plotIndiv(RNA_prot_miRNA.splsda, legend = T, ind.names = F, ellipse = T, style = "lattice")
 
 ```
 
@@ -448,9 +494,22 @@ keepX = list(mrna = c(15,10), prot = c(15,10), mirna = c(15,10))
 
 RNA_prot_miRNA.splsda2 = block.splsda(X = data2, Y = sample$Y, ncomp = 2, keepX, scale = T)
 
-#plotVar(RNA_prot_miRNA.splsda2, legend = T)
+plotVar(RNA_prot_miRNA.splsda2, legend = T)
 
 ```
+
+```{r}
+
+selectVar(RNA_prot_miRNA.splsda2, comp = 1)
+
+```
+
+```{r}
+
+selectVar(RNA_prot_miRNA.splsda2, comp = 2)
+
+```
+
 
 4. Réalisez un *circos plot* avec le modèle obtenu en affichant les corrélations fortes $|\rho| > 0.5$. Ajoutez un titre.
 

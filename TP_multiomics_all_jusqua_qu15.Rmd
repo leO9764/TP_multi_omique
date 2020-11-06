@@ -297,20 +297,28 @@ cim(RNA_prot.spls, title = "CIM Plot of spls (mRNA and proteine)" , save = 'jpeg
 **Question 12:** Quels sont les gènes et les protéines les plus corrélés? Justifiez à partir de la matrice de corrélation calculée par `cim()`.
 
 ```{r}
-
-correlation = cim(RNA_prot.spls, title = "CIM Plot of spls",margins = c(2,2))$mat.cor
+pdf("cim.pdf")
+cim(RNA_prot.spls, title = "CIM Plot of spls", margins = c(2,2))$mat.cor
+dev.off()
 
 ```
+Les gènes les plus corrélés semblent être les gènes KDM4B, ZNF552, PREX1 et LRIG1.
+
+
 
 6. Toujours à partir du même modèle *sPLS*, affichez un *network plot* en affichant uniquement les les corrélations les plus forte $(\rho \pm 0.65)$.
 
 ```{r}
 
-network(RNA_prot.spls,  cutoff = 0.65, save = 'jpeg', name.save = 'sPLSnetwork')
+pdf("network.pdf")
+network(RNA_prot.spls,  cutoff = 0.65)
+dev.off()
 
 ```
 
 **Question 13:** Combien de clusters / sous-graphes observez vous ?
+Nous n'observons qu'un seul sous graphe, correspondant au groupe de gènes très corrélés.
+
 
 ## 2. *multiblock* Projection on Latent Structures
 
@@ -318,10 +326,12 @@ network(RNA_prot.spls,  cutoff = 0.65, save = 'jpeg', name.save = 'sPLSnetwork')
 
 ```{r}
 
-
 blocks = list(mrna = liste_mrna_filtre, prot = liste_prot_filtre)
+
 pls_rna_prot_mirna = block.pls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 2, scale = T)
 pls_rna_prot_mirna
+
+plotVar(pls_rna_prot_mirna, legend = T)
 
 ```
 
@@ -331,8 +341,8 @@ pls_rna_prot_mirna
 
 keepX = list(mrna = c(10,5), prot = c(9,4))
 
-RNA_prot_miRNA.spls = block.spls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 2,
-   mode = "regression", scale = T, keepX, keepY = list(7,3))
+RNA_prot_miRNA.spls =  block.spls(X = blocks, as.matrix(liste_mirna_filtre), ncomp = 2, scale = TRUE, Y =    as.matrix(liste_mirna_filtre), keepX, keepY = c(7,3))
+
 
 RNA_prot_miRNA.spls
 
