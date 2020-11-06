@@ -280,8 +280,9 @@ network(RNA_prot.spls,  cutoff = 0.65, save = 'jpeg', name.save = 'sPLSnetwork')
 
 ```{r}
 
-blocks = list(t(liste_mrna_filtre), t(liste_prot_filtre))
-pls_rna_prot_mirna = block.pls(X = blocks, Y = t(liste_mirna_filtre), ncomp = 2)
+
+blocks = list(mrna = liste_mrna_filtre, prot = liste_prot_filtre)
+pls_rna_prot_mirna = block.pls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 2)
 pls_rna_prot_mirna
 
 ```
@@ -289,8 +290,9 @@ pls_rna_prot_mirna
 2. Comme la `spls()`, la `block.spls()` implémente une étape de *feature selection*. En utilisant la documentation de la fonction et/ou l'aide disponible en ligne,  utilisez la fonction de manière a sélectionner (10 gènes, 9 protéines, 7 miRNA) sur la première composante et (5 gènes, 4 protéines, 3 miRNA) sur la seconde composante.
 
 ```{r}
-RNA_prot_miRNA.spls = block.spls(X = list(liste_mrna_filtre, liste_prot_filtre), Y = miRNA, ncomp = 1, 
-                    mode = "regression", scale = TRUE, keepX = c(10,9), keepY = c(7))
+
+RNA_prot_miRNA.spls = block.spls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 1, 
+                    mode = "regression", scale = TRUE, keepX = list(10,9), keepY = c(7))
 RNA_prot_miRNA.spls
 
 ```
@@ -352,7 +354,7 @@ plot(perf(RNA_prot_miRNA.splsda))
 
 ```{r}
 
-
+RNA_prot_miRNA.splsda2 = block.splsda(X = data2, Y = sample$Y, ncomp = 2, keepX = list(1,2))
 
 ```
 
