@@ -261,7 +261,7 @@ cim(RNA_prot.spls, title = "CIM Plot of spls (mRNA and proteine)" ,save = 'jpeg'
 
 ```{r}
 
-correlation = cim(RNA_prot.spls, title = "CIM Plot of spls")$mat.co
+correlation = cim(RNA_prot.spls, title = "CIM Plot of spls",margins = c(2,2))$mat.cor
 ```
 
 6. Toujours à partir du même modèle *sPLS*, affichez un *network plot* en affichant uniquement les les corrélations les plus forte $(\rho \pm 0.65)$.
@@ -330,7 +330,9 @@ plotIndiv(plsda_gene, col = c("red","blue", "darkgreen"), legend = T, ellipse = 
 1. Réalisez une multiblock sPLS-DA `block.splsda()` avec les données mRNA, protéines, miRNA `(X = list(mrna, prot, mirna))` et le groupe en incluant 5 composantes `(ncomp = 5)`.
 
 ```{r}
-
+data2 = list(mrna = liste_mrna_filtre, mirna = liste_mirna_filtre,proteine =liste_prot_filtre)
+RNA_prot_miRNA.splsda =block.splsda(X= data2,Y=sample$Y, ncomp = 5)
+RNA_prot_miRNA.splsda
 
 
 ```
@@ -338,7 +340,7 @@ plotIndiv(plsda_gene, col = c("red","blue", "darkgreen"), legend = T, ellipse = 
 2. Utiliser la fonction `perf()` sur le modèle obtenu. 
 
 ```{r}
-
+plot(perf(RNA_prot_miRNA.splsda))
 
 
 ```
