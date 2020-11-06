@@ -33,33 +33,40 @@ De l'aide est disponible sur leur site (http://mixomics.org/).
 
 1. Chargez le package `mixOmics`
 ```{r}
+
 getwd()
 #setwd('path_to_the_data_directory')
-require(mixOmics)
+library("mixOmics")
+
 ```
 
 
 2. Téléchargez et importez les données (4 fichiers: `mirna.csv`, `mrna.csv`, `protein.csv`, `sample_group.csv`)
 ```{r}
+
 mirna = read.table('mirna.csv', sep = ',', header = T, row.names = 1) ; typeof(mirna)
 mrna = read.table('mrna.csv', sep = ',', header = T, row.names = 1)
 protein = read.table('protein.csv', sep = ',', header = T, row.names = 1)
 sample = read.table('sample_group.csv', sep = ',', header = T, row.names = 1)
+
 ```
 
 
 **Question 1:** Combien avez-vous d'échantillons ? de variables (mRNA, protéines, miRNA) ?
 ```{r}
-dim(mirna) # 150 observations pour 184 variables
-dim(mrna) # 150 observations pour 200 variables
-dim(protein) # 150 observations pour 142 variables
-dim(sample) # 150 observations pour 1 variable
+
+dim(mirna) # 150 observations pour 185 variables
+dim(mrna) # 150 observations pour 185 variables
+dim(protein) # 150 observations pour 143 variables
+dim(sample) # 150 observations pour 2 variables
+
 ```
 
 
 3. Le coefficient de variation est défini comme le rapport entre l'écart-type $\sigma$ et la moyenne $\mu$ : $c_v = \frac{\sigma}{\mu}$
 Construisez une fonction qui calcule le coefficient de variation à partir d'un vecteur.
 ```{r}
+
 coef_var = function(vecteur) {
   ecart = sd(vecteur)
    moy = mean(vecteur)
@@ -71,55 +78,66 @@ coef_var = function(vecteur) {
 liste_mirna = as.matrix(apply(mirna, 2, coef_var)) ; typeof(liste_mirna)
 liste_mrna = as.matrix(apply(mrna, 2, coef_var))
 liste_prot = as.matrix(apply(protein, 2, coef_var))
+
 ```
 
 
 4. A l'aide d'un histogramme `hist()` affichez la distribution de chacun des blocs.
 ```{r}
+
 hist(liste_mirna) # Les coeffcients de variation qui ont une valeur entre 0.05 et 0.1 sont les plus representes
 hist(liste_mrna) # Les coeffcients de variation qui ont une valeur entre 0.05 et 0.1 sont les plus representes
 hist(liste_prot) # Les coeffcients de variation qui ont une valeur entre 0 et 50 sont les plus representes
+
 ```
 
 
 **Question 2:** La distribution des coefficients de variation est-elle similaire dans les 3 blocs ?
 Si oui, quel type de donnée possède le plus de variabilité ?
 ```{r}
+
 # La distrubution  des coefficients de variation ne sont pas similaire entre les trois blocs.
 # Cependant elle semble identique entre les blocs mirna et mrna.
 
 var(liste_mirna) # 0.005311241
-var(liste_mrna) # 0.003948499
+var(liste_mrna) # 0.005311241
 var(liste_prot) # 1070.215
+
 ```
 
 
 5. Pour chacun des blocs, filtrez les données les plus variantes : $|c_{v}| \geq 0.15$
 ```{r}
+
 liste_mirna_filtre = mirna[, names(which(abs(apply(mirna, 2, coef_var)) >= 0.15))] ; class(liste_mirna_filtre)
 liste_mrna_filtre = mrna[, names(which(abs(apply(mrna, 2, coef_var)) >= 0.15))]
 liste_prot_filtre = protein[, names(which(abs(apply(protein, 2, coef_var)) >= 0.15))]
+
 ```
 
 
 **Question 3:**: Combien reste-il de gènes ? de protéines ? de miRNA ?
 ```{r}
+
 length(liste_mirna_filtre) # 82
-length(liste_mrna_filtre) # 174
-length(liste_prot_filtre) # 142
+length(liste_mrna_filtre) # 82
+length(liste_prot_filtre) # 90
+
 ```
 
 
 **Question 4:** Quel est le gène le plus variant ? La protéine associé à ce gène est-elle présente dans le jeu de donnée.
 ```{r}
+
 max(liste_mirna_filtre)
-max_liste_mirna = which(colnames(liste_mirna_filtre) == max(liste_mirna_filtre)) ; max_liste_mirna # hsa.mir.452 max val = 0.362615
+max_liste_mirna = which(liste_mirna_filtre[,1] == max(liste_mirna_filtre)) ; max_liste_mirna # hsa.mir.452 max val = 0.362615
 
 max(liste_mrna_filtre)
 max_liste_mrna = which(liste_mrna[,1] == max(liste_mrna_filtre)) ; max_liste_mrna # PLCD4 max val = 0.4687827
 
 max(liste_prot_filtre)
 max_liste_prot = which(liste_prot[,1] == max(liste_prot_filtre)) ; max_liste_prot # RBM3 max val = 225.9916 , proteine bien dans jeu de donnéé
+
 ```
 
 
@@ -144,6 +162,7 @@ max_liste_prot = which(liste_prot[,1] == max(liste_prot_filtre)) ; max_liste_pro
 
 1. Réaliser l'ACP sur les données mRNA.
 ```{r}
+
 acp_mrna = pca(liste_mrna_filtre, ncomp = 10)
 
 dim(liste_mrna_filtre)
@@ -153,6 +172,7 @@ plot(acp_mrna) # on choisit 2 composantes car c'est le coude au niveau du plot
 plotIndiv(acp_mrna)
 plotVar(acp_mrna)
 biplot(acp_mrna)
+
 ```
 
 
@@ -161,8 +181,10 @@ Nous retenons 2 composants, car ils représentent environs 35% de la variance
 
 2. Après avoir relancer l'ACP avec le bon nombre de composante, utiliser un graphique pour représenter les variables.
 ```{r}
+
 acp_mrna2 = pca(liste_mrna_filtre, ncomp = 2) 
 plot(acp_mrna2)
+
 ```
 
 **Question 8:** Quelles sont les variables qui contribuent le plus à l'axe 1 ?
@@ -171,25 +193,31 @@ Avec le plotloadings de mixomics, on peut observer l'importance des variables de
 3. Avec un graphique, représenter les échantillons dans l'espace formé par les composantes. 
 Les échantillons sont colorés en fonction du groupe. Affichez la légende et ajoutez un titre.
 ```{r}
+
 plotLoadings(acp_mrna2, ndisplay =20)
 plot(acp_mrna2$X,col = liste_mrna_filtre[,1],main="Echantillons formé par les composantes de l'acp" )
 selectVar(acp_mrna2)
 legend(-3, 3, legend=c("Point 1", "Point 2","Point 3","Point 4","Point 5"),
        col=c("red", "blue","black","green","aquamarine"), pch =1, cex=0.8)
+
 ```
 
 4. La *sparse ACP* `spca()` implémente une étape de *feature selection*. En utilisant la documentation de la fonction et/ou l'aide disponible en ligne,  utilisez la `spca()` de manière a sélectionner 10 gènes sur la première composante et 5 gènes sur la seconde composante.
 
 ```{r}
+
 spca_mrna=spca(liste_mrna_filtre,ncomp=2,keepX=c( 10,5))
 print(spca_mrna)
 plotVar(spca_mrna,cex=0.5)
+
 ```
 
 **Question 9:** Quelles sont les gènes que vous avez sélectionnés? *(une fonction est disponible)*
 ```{r}
+
 selectVar(spca_mrna, comp = 1)$value
 selectVar(spca_mrna, comp = 2)$value
+
 ```
 
 
@@ -197,13 +225,17 @@ selectVar(spca_mrna, comp = 2)$value
 
 1. Réalisez une PLS `pls()` avec les données mRNA et protéines en incluant 3 composantes `(ncomp = 3)`.
 ```{r}
-pls_mRNA_prot=pls(liste_mrna_filtre,liste_prot_filtre, ncomp=4)
+
+pls_mRNA_prot = pls(liste_mrna_filtre,liste_prot_filtre, ncomp=4, scale = T, mode = "regression")
 set.seed(30) # for reproducbility in this vignette, otherwise increase nrepeat
 perf.pls <- perf(pls_mRNA_prot, validation = "Mfold", folds = 5,
                   progressBar = FALSE, nrepeat = 10)
 plot(perf.pls$Q2.total)
 abline(h = 0.0975)#he rule of thumbs is that a PLS component should be included in the model if its value is ≤0.0975
- 
+
+plotIndiv(pls_mRNA_prot, group = sample$Y, legend = T, ind.names = F, ellipse = F, style = "lattice")
+
+plotArrow(pls_mRNA_prot, group = sample$Y, legend = T, abline = T)
 
 ```
 
@@ -215,51 +247,98 @@ Les échantillons doivent être coloriés par groupe. Ajoutez une légende et un
 
 plot(pls_mRNA_prot$X[,2:3],col=liste_mrna_filtre[,1])
 
+plotIndiv(pls_mRNA_prot, comp = c(2,3), group = sample$Y, legend = T, ind.names = F, ellipse = F, style = "lattice")
+
 ```
 
 3. Affichez un *arrow plot* en affichant uniquement les composantes 1 et 3.
 Les flèches doivent être coloriés par groupe. Ajoutez une légende et un titre.
 ```{r}
 
-plotArrow(pls_mRNA_prot)
+plotArrow(pls_mRNA_prot, comp = c(1,3),
+          group = sample$Y,
+          legend = TRUE,
+          X.label = "PLS comp1",
+          Y.label = "PLS comp3",
+          title = "Arrow plot of mRNA and protein PLS (comp1, comp3)"
+          )
 
 ```
 
 4. La *sparse PLS* `spls()` implémente une étape de *feature selection*. En utilisant la documentation de la fonction et/ou l'aide disponible en ligne,  utilisez la *sPLS* de manière a sélectionner (10 gènes, 9 protéines) sur la première composante, (5 gènes, 5 protéines) sur la seconde composante et (1 gène, 1 protéine) sur la troisième composante.
 
+```{r}
+
+RNA_prot.spls = spls(X = liste_mrna_filtre, Y = liste_prot_filtre, ncomp = 3, 
+                    mode = "regression", scale = TRUE, keepX = c(10,5,1),keepY = c(9,5,1))
+RNA_prot.spls
+
+
+```
+
 **Question 11:** Quels sont les variables sélectionnées sur la troisième composante.
+
+```{r}
+
+#(1 gène, 1 protéine) sur la troisième composante.
+plotLoadings(RNA_prot.spls, comp = 3, title = "spls, comp3", size.name = 0.8)
+
+```
+
 
 5. Affichez un *CIM plot* à partir du modèle *sPLS*.
 
+```{r}
+
+cim(RNA_prot.spls, title = "CIM Plot of spls (mRNA and proteine)" , save = 'jpeg', name.save = 'sPLScim')
+
+```
+
 **Question 12:** Quels sont les gènes et les protéines les plus corrélés? Justifiez à partir de la matrice de corrélation calculée par `cim()`.
+
+```{r}
+
+correlation = cim(RNA_prot.spls, title = "CIM Plot of spls",margins = c(2,2))$mat.cor
+
+```
 
 6. Toujours à partir du même modèle *sPLS*, affichez un *network plot* en affichant uniquement les les corrélations les plus forte $(\rho \pm 0.65)$.
 
-**Question 13:** Combien de clusters / sous-graphes observés vous ?
+```{r}
+
+network(RNA_prot.spls,  cutoff = 0.65, save = 'jpeg', name.save = 'sPLSnetwork')
+
+```
+
+**Question 13:** Combien de clusters / sous-graphes observez vous ?
 
 ## 2. *multiblock* Projection on Latent Structures
 
 1. Réalisez une multiblock PLS `pls()` avec les données mRNA, protéines et miRNA `(X = list(mrna, prot), Y = mirna)` en incluant 2 composantes `(ncomp = 2)`.
 
 ```{r}
-blocks = list(mrna = liste_mrna_filtre, prot = liste_prot_filtre)
-pls_rna_prot_mirna = block.pls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 2)
-pls_rna_prot_mirna
-```
 
+
+blocks = list(mrna = liste_mrna_filtre, prot = liste_prot_filtre)
+pls_rna_prot_mirna = block.pls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 2, scale = T)
+pls_rna_prot_mirna
+
+```
 
 2. Comme la `spls()`, la `block.spls()` implémente une étape de *feature selection*. En utilisant la documentation de la fonction et/ou l'aide disponible en ligne,  utilisez la fonction de manière a sélectionner (10 gènes, 9 protéines, 7 miRNA) sur la première composante et (5 gènes, 4 protéines, 3 miRNA) sur la seconde composante.
 
 ```{r}
 
-RNA_prot_miRNA.spls = block.spls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 1, 
-                    mode = "regression", scale = TRUE, keepX = list(10,9), keepY = list(7))
+keepX = list(mrna = c(10,5), prot = c(9,4))
+
+RNA_prot_miRNA.spls = block.spls(X = blocks, Y = as.matrix(as.data.frame(liste_mirna_filtre)), ncomp = 2,
+   mode = "regression", scale = T, keepX, keepY = list(7,3))
+
 RNA_prot_miRNA.spls
 
+plotVar(RNA_prot_miRNA.spls, legend = T)
+
 ```
-
-
-
 
 **Question 14:** Quels sont les variables sélectionnées sur la première composante.
 
@@ -320,8 +399,11 @@ plot(perf(RNA_prot_miRNA.splsda))
 
 ```{r}
 
-RNA_prot_miRNA.splsda2 = block.splsda(X = data2, Y = sample$Y, ncomp = 2, keepX = list(1,2))
-RNA_prot_miRNA.splsda2
+keepX = list(mrna = c(15,10), prot = c(15,10), mirna = c(15,10))
+
+RNA_prot_miRNA.splsda2 = block.splsda(X = data2, Y = sample$Y, ncomp = 2, keepX, scale = T)
+
+#plotVar(RNA_prot_miRNA.splsda2, legend = T)
 
 ```
 
@@ -329,7 +411,8 @@ RNA_prot_miRNA.splsda2
 
 ```{r}
 
-circosPlot(RNA_prot_miRNA.splsda2, title = "titre")
+circosPlot(RNA_prot_miRNA.splsda2, cutoff = abs(0.5), line = T, legend = T)
+title("Circos plot de la composante 1 et 2") 
 
 ```
 
