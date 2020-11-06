@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 libray---
 title: "TP \"Multi-omics\""
 date: "20 - 21 octobre 2020"
@@ -333,18 +338,13 @@ plotLoadings(RNA_prot.spls, comp = 3, title = "spls, comp3", size.name = 0.8)
 
 5. Affichez un *CIM plot* à partir du modèle *sPLS*.
 
-```{r}
-
-cim(RNA_prot.spls, title = "CIM Plot of spls (mRNA and proteine)" , save = 'jpeg', name.save = 'sPLScim')
-
-```
 
 **Question 12:** Quels sont les gènes et les protéines les plus corrélés? Justifiez à partir de la matrice de corrélation calculée par `cim()`.
 
 ```{r}
 
 pdf("cim.pdf")
-cim(RNA_prot.spls, title = "CIM Plot of spls", margins = c(2,2))$mat.cor
+cim(RNA_prot.spls, title = "CIM Plot of spls")$mat.cor
 dev.off()
 
 ```
@@ -354,7 +354,7 @@ dev.off()
 ```{r}
 
 pdf("network.pdf")
-network(RNA_prot.spls,  cutoff = 0.65)
+network(RNA_prot.spls, cutoff = 0.65)
 dev.off()
 
 ```
