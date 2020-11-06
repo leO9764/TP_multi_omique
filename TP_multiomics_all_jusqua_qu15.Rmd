@@ -350,7 +350,10 @@ plot(perf(RNA_prot_miRNA.splsda))
 3. Relancez le modèle avec 2 composantes et utilisez l'option `keepX` pour sélectionner 15 gènes, protéines et miRNA sur la première compoante et 10 gènes, protéines et miRNA sur la seconde composante.
 
 ```{r}
+data2 = list(mrna = liste_mrna_filtre, mirna = liste_mirna_filtre,proteine =liste_prot_filtre)
 
+RNA_prot_miRNA.splsda =block.splsda(X= data2,Y=sample$Y, ncomp = 2, keepX = c(15,10))
+RNA_prot_miRNA.splsda
 
 
 ```
